@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.wear_store"
+    namespace = "com.turtlepaw.wear_store"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
