@@ -10,6 +10,7 @@ import 'package:wear_store/routes/login.dart';
 import 'package:wear_store/routes/login_modal.dart';
 import 'package:wear_store/routes/settings.dart';
 import 'package:wear_store/routes/splash_screen.dart';
+import 'package:wear_store/routes/user.dart';
 import 'package:wear_store/routes/watchface.dart';
 import 'package:wear_store/utils/pocketbase.dart';
 import 'package:wear_store/utils/wearManager.dart';
@@ -80,6 +81,12 @@ final _router = GoRouter(
           pageBuilder: (BuildContext context, GoRouterState state) {
             return defaultPageBuilder(
                 WatchFace(id: state.pathParameters['id']))(context, state);
+          }),
+      GoRoute(
+          path: '/user/:id',
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return defaultPageBuilder(
+                UserProfile(id: state.pathParameters['id']))(context, state);
           }),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

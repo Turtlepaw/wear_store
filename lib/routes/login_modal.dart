@@ -40,24 +40,28 @@ class _LoginDialogState extends State<LoginDialog> {
               ),
             ),
             body: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.waving_hand_rounded,
-                  size: 45,
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.waving_hand_rounded,
+                      size: 45,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      "Join $appName",
+                      style: theme.textTheme.displaySmall,
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 15,
                 ),
                 Text(
-                  "Hey there!",
-                  style: theme.textTheme.displaySmall,
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  "What's so great about being an $appName user?",
+                  "How it works",
                   style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(
