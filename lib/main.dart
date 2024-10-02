@@ -88,6 +88,8 @@ final _router = GoRouter(
             return defaultPageBuilder(
                 UserProfile(id: state.pathParameters['id']))(context, state);
           }),
+      GoRoute(
+          path: '/login', pageBuilder: defaultPageBuilder(const LoginDialog())),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         pageBuilder: (context, state, child) {

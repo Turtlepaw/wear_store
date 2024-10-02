@@ -178,10 +178,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _requestLogoutConfirmation() {
     if (username == null) {
-      showDialog(
-          context: context,
-          builder: (context) => LoginDialog(),
-          useSafeArea: true);
+      // showDialog(
+      //     context: context,
+      //     builder: (context) => LoginDialog(),
+      //     useSafeArea: true);
+      context.push("/login");
     } else {
       final pb = Provider.of<PocketBase>(context, listen: false);
       showDialog(
@@ -193,7 +194,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 description: "Are you sure you want to logout?",
                 onConfirm: () async {
                   pb.authStore.clear();
-                  context.go("/login");
+                  context.pop();
                 },
               ),
           useSafeArea: false);
