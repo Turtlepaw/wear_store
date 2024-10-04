@@ -8,6 +8,7 @@ import 'package:wear_store/routes/editProfile.dart';
 import 'package:wear_store/routes/home.dart';
 import 'package:wear_store/routes/login.dart';
 import 'package:wear_store/routes/login_modal.dart';
+import 'package:wear_store/routes/search.dart';
 import 'package:wear_store/routes/settings.dart';
 import 'package:wear_store/routes/splash_screen.dart';
 import 'package:wear_store/routes/user.dart';
@@ -84,12 +85,18 @@ final _router = GoRouter(
           }),
       GoRoute(
           path: '/user/:id',
-          pageBuilder: (BuildContext context, GoRouterState state) {
+          pageBuilder: (context, state) {
             return defaultPageBuilder(
                 UserProfile(id: state.pathParameters['id']))(context, state);
           }),
       GoRoute(
           path: '/login', pageBuilder: defaultPageBuilder(const LoginDialog())),
+      GoRoute(
+        path: '/search',
+        pageBuilder: (context, state) => defaultPageBuilder(Search(
+            text: state.uri.queryParameters['text'],
+            tags: state.uri.queryParameters['tags']))(context, state),
+      ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         pageBuilder: (context, state, child) {

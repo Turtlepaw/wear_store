@@ -38,6 +38,21 @@ class _HomePageState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Browse Watch Faces"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(100),
+              onTap: () {
+                context.push("/search");
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(5),
+                child: Icon(Symbols.search_rounded),
+              ),
+            ),
+          )
+        ],
       ),
       body: Center(
           child: GridView.builder(

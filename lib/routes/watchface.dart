@@ -116,7 +116,7 @@ class _WatchFacePageState extends State<WatchFace> {
               Container(
                 decoration: const BoxDecoration(
                     color: Colors.black, shape: BoxShape.circle),
-                height: 120,
+                height: 180,
               ),
               Image.network(
                 pb.files
@@ -126,14 +126,14 @@ class _WatchFacePageState extends State<WatchFace> {
                       thumb: '100x250',
                     )
                     .toString(),
-                width: 101,
+                width: 149,
                 //height: 100,
               ),
               // Overlay image (Local Asset Image)
               Image.asset(
                 'assets/pixel-watch.png',
-                width: 150, // Size for the overlay image
-                height: 150,
+                width: 220, // Size for the overlay image
+                height: 220,
               ),
             ],
           ),
@@ -154,7 +154,8 @@ class _WatchFacePageState extends State<WatchFace> {
             ),
           ),
           const SizedBox(height: 5),
-          buildTags(theme, wf),
+          if (wf.getListValue("tags", List.empty()).isNotEmpty)
+            buildTags(theme, wf),
           const SizedBox(height: 5),
           IntrinsicWidth(
             child: FilledButton(
@@ -291,7 +292,12 @@ class _WatchFacePageState extends State<WatchFace> {
             spacing: 10, // Horizontal space between tags
             runSpacing: 10, // Vertical space between lines
             children: wf.expand['tags']!.map((tag) {
-              return Chip(
+              return RawChip(
+                onPressed: () {
+                  context.push(
+                      Uri(path: '/search', queryParameters: {'tags': tag.id})
+                          .toString());
+                },
                 label: Text(tag.getStringValue("name")),
                 avatar: const Icon(Symbols.tag_rounded),
               );
