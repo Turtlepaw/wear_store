@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:provider/provider.dart';
-import 'package:wear_store/components/navigation.dart';
+import 'package:flutter/material.dart';
+import 'package:wear_store/components/grid.dart';
+import 'package:wear_store/routes/watchface.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,9 +16,9 @@ class Home extends StatefulWidget {
 class _HomePageState extends State<Home> {
   bool isLoading = false;
   List<RecordModel>? faces;
+  List<RecordModel>? collections;
   late PocketBase pb;
 
-  @override
   @override
   void initState() {
     super.initState();
@@ -27,8 +28,11 @@ class _HomePageState extends State<Home> {
 
   void getFaces(PocketBase pb) async {
     var data = await pb.collection("faces").getFullList(expand: "owner");
+    var collectionsData =
+        await pb.collection("collections").getFullList(expand: "watchfaces");
     setState(() {
       faces = data;
+      collections = collectionsData;
     });
   }
 
@@ -40,110 +44,120 @@ class _HomePageState extends State<Home> {
         title: const Text("Browse Watch Faces"),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(100),
-              onTap: () {
-                context.push("/search");
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(5),
-                child: Icon(Symbols.search_rounded),
-              ),
-            ),
-          )
+              padding: const EdgeInsets.only(right: 20),
+              child: Tooltip(
+                message: "Search",
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(100),
+                  onTap: () {
+                    context.push("/search");
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Icon(Symbols.search_rounded),
+                  ),
+                ),
+              ))
         ],
       ),
       body: Center(
-          child: GridView.builder(
-        padding: EdgeInsets.only(top: 10),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 15,
-          childAspectRatio:
-              0.8, // Adjust this ratio to make the height more flexible
-        ),
-        itemCount: faces?.length ?? 0,
-        itemBuilder: (context, index) {
-          final face = faces![index];
-          return Card.outlined(
-              child: InkWell(
-            borderRadius: BorderRadius.circular(15),
-            onTap: () {
-              context.push("/watchface/${face.id}");
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                children: [
-                  Stack(
-                    alignment:
-                        Alignment.center, // Aligns both images to the center
+        child: CustomScrollView(
+          slivers: [
+            ...(collections ?? List.empty()).map((c) => SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                            color: Colors.black, shape: BoxShape.circle),
-                        height: 120,
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 20, bottom: 10, top: 10),
+                        child: Text(
+                          c.getStringValue("name"),
+                          style: theme.textTheme.headlineMedium,
+                        ),
                       ),
-                      Image.network(
-                        pb.files
-                            .getUrl(
-                              face,
-                              face.getListValue<String>('image')[0],
-                              thumb: '100x250',
-                            )
-                            .toString(),
-                        width: 101,
-                        //height: 100,
-                      ),
-                      // Overlay image (Local Asset Image)
-                      Image.asset(
-                        'assets/pixel-watch.png',
-                        width: 150, // Size for the overlay image
-                        height: 150,
+                      SizedBox(
+                        height: 250, // Height for the carousel
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal, // No snapping
+                          itemCount: c.expand['watchfaces']!.length,
+                          itemBuilder: (context, index) {
+                            var face = c.expand['watchfaces']![index];
+                            return Container(
+                              width: 200, // Fixed width for each card
+                              margin: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Card.outlined(
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(5),
+                                  onTap: () {
+                                    context.push("/watchface/${face.id}");
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        SizedBox(
+                                          height:
+                                              150, // Fixed height for the image area
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Container(
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.black,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                height: 120,
+                                              ),
+                                              Image.network(
+                                                pb.files
+                                                    .getUrl(
+                                                      face,
+                                                      face.getListValue<String>(
+                                                          'image')[0],
+                                                      thumb: '100x250',
+                                                    )
+                                                    .toString(),
+                                                width: 101,
+                                              ),
+                                              Image.asset(
+                                                'assets/pixel-watch.png',
+                                                width: 150,
+                                                height: 150,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 15),
+                                        Text(
+                                          face.getStringValue("name"),
+                                          style: theme.textTheme.headlineMedium,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (face.expand['owner']!.first
-                              ?.getStringValue("devId", null) !=
-                          null)
-                        const Icon(
-                          Symbols.verified_rounded,
-                          size: 22,
-                        ),
-                      if (face.expand['owner']!.first
-                              ?.getStringValue("devId", null) !=
-                          null)
-                        const SizedBox(
-                          width: 7,
-                        ),
-                      Text(
-                        face.expand['owner']!.first
-                            .getStringValue("displayName"),
-                        style: theme.textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    face.getStringValue("name"),
-                    style: theme.textTheme.headlineMedium,
-                  )
-                ],
+                )),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  "All Watch Faces",
+                  style: theme.textTheme.headlineLarge,
+                ),
               ),
             ),
-          ));
-        },
-      )),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.add),
-      // ),
+            WatchFaceGrid(faces),
+          ],
+        ),
+      ),
     );
   }
 }

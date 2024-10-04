@@ -30,7 +30,8 @@ CustomTransitionPage buildPageWithDefaultTransition<T>({
   return CustomTransitionPage<T>(
     key: state.pageKey,
     child: child,
-    transitionDuration: const Duration(milliseconds: 50),
+    transitionDuration: const Duration(milliseconds: 150),
+    reverseTransitionDuration: const Duration(milliseconds: 150),
     transitionsBuilder: (context, animation, secondaryAnimation, child) =>
         FadeTransition(opacity: animation, child: child),
   );
@@ -45,6 +46,53 @@ Page<dynamic> Function(BuildContext, GoRouterState) defaultPageBuilder<T>(
         child: child,
       );
     };
+
+CustomTransitionPage buildPageWithSmoothFadeSlideTransition<T>({
+  required BuildContext context,
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration:
+        const Duration(milliseconds: 250), // Adjust duration for smoothness
+    reverseTransitionDuration: const Duration(milliseconds: 250),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.01, 0.0); // Slight slide, mainly fade
+      const end = Offset.zero;
+      const curve =
+          Curves.easeIn; // Smooth 'easeIn' curve for both slide and fade
+
+      var slideTween =
+          Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var slideAnimation = animation.drive(slideTween);
+
+      var fadeAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeIn, // Smooth fade-in
+      );
+
+      return FadeTransition(
+        opacity: fadeAnimation,
+        child: SlideTransition(
+          position: slideAnimation, // Slide is subtle
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+Page<dynamic> Function(BuildContext, GoRouterState)
+    defaultSmoothFadeSlidePageBuilder<T>(Widget child) =>
+        (BuildContext context, GoRouterState state) {
+          return buildPageWithSmoothFadeSlideTransition<T>(
+            context: context,
+            state: state,
+            child: child,
+          );
+        };
 
 final _router = GoRouter(
     initialLocation: '/home',
@@ -80,7 +128,7 @@ final _router = GoRouter(
       GoRoute(
           path: '/watchface/:id',
           pageBuilder: (BuildContext context, GoRouterState state) {
-            return defaultPageBuilder(
+            return defaultSmoothFadeSlidePageBuilder(
                 WatchFace(id: state.pathParameters['id']))(context, state);
           }),
       GoRoute(
@@ -93,9 +141,10 @@ final _router = GoRouter(
           path: '/login', pageBuilder: defaultPageBuilder(const LoginDialog())),
       GoRoute(
         path: '/search',
-        pageBuilder: (context, state) => defaultPageBuilder(Search(
-            text: state.uri.queryParameters['text'],
-            tags: state.uri.queryParameters['tags']))(context, state),
+        pageBuilder: (context, state) => defaultSmoothFadeSlidePageBuilder(
+            Search(
+                text: state.uri.queryParameters['text'],
+                tags: state.uri.queryParameters['tags']))(context, state),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
@@ -135,11 +184,11 @@ void main() async {
 }
 
 class App extends StatelessWidget {
-  static final _defaultLightColorScheme =
-      ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple);
+  static final _defaultLightColorScheme = ColorScheme.fromSeed(
+      seedColor: HexColor("#979dcc"), brightness: Brightness.light);
 
-  static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
-      primarySwatch: Colors.deepPurple, brightness: Brightness.dark);
+  static final _defaultDarkColorScheme = ColorScheme.fromSeed(
+      seedColor: HexColor("#979dcc"), brightness: Brightness.dark);
 
   const App({super.key});
 
@@ -177,4 +226,16 @@ class App extends StatelessWidget {
       );
     });
   }
+}
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll("#", "");
+    if (hexColor.length == 6) {
+      hexColor = "FF$hexColor";
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }

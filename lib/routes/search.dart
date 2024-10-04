@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:wear_store/components/loader.dart';
 import 'package:wear_store/components/navigation.dart';
 
+import '../components/grid.dart';
+
 class Search extends StatefulWidget {
   final String? text;
   final String? tags;
@@ -138,69 +140,7 @@ class _SearchPageState extends State<Search> {
             ),
 
             // Sliver for the Grid below
-            SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-                childAspectRatio:
-                    0.85, // Adjust this ratio to make the height more flexible
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final face = faces![index];
-                  return Card.outlined(
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(15),
-                      onTap: () {
-                        context.push("/watchface/${face.id}");
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Column(
-                          children: [
-                            Stack(
-                              alignment: Alignment
-                                  .center, // Aligns both images to the center
-                              children: [
-                                Container(
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  height: 120,
-                                ),
-                                Image.network(
-                                  pb.files
-                                      .getUrl(
-                                        face,
-                                        face.getListValue<String>('image')[0],
-                                        thumb: '100x250',
-                                      )
-                                      .toString(),
-                                  width: 101,
-                                ),
-                                Image.asset(
-                                  'assets/pixel-watch.png',
-                                  width: 150, // Size for the overlay image
-                                  height: 150,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Text(
-                              face.getStringValue("name"),
-                              style: theme.textTheme.headlineMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                childCount: faces?.length ?? 0,
-              ),
-            ),
+            WatchFaceGrid(faces),
           ],
         ));
   }
