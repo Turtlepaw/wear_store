@@ -1,22 +1,23 @@
+import 'dart:io';
+
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:provider/provider.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:wear_store/routes/editProfile.dart';
 import 'package:wear_store/routes/home.dart';
-import 'package:wear_store/routes/login.dart';
 import 'package:wear_store/routes/login_modal.dart';
 import 'package:wear_store/routes/search.dart';
 import 'package:wear_store/routes/settings.dart';
-import 'package:wear_store/routes/splash_screen.dart';
 import 'package:wear_store/routes/user.dart';
 import 'package:wear_store/routes/watchface.dart';
 import 'package:wear_store/utils/pocketbase.dart';
 import 'package:wear_store/utils/wearManager.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
 import 'components/navigation.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -171,6 +172,7 @@ void main() async {
   final pb = await initializePocketbase();
   final wearManager = WearManager(pb).sendAuthentication();
 
+  if (kIsWeb) usePathUrlStrategy();
   runApp(
     MultiProvider(
       providers: [
