@@ -1,11 +1,11 @@
 {
-    "name": "wear_store",
-    "short_name": "wear_store",
+    "name": "Orbit - Wear OS Store",
+    "short_name": "Orbit",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "An open-source app store for Wear OS.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
