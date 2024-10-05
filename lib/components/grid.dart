@@ -123,8 +123,10 @@ class WatchFaceGrid extends StatelessWidget {
 
   double _getChildAspectRatio(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    if (screenWidth > 1200) {
-      return 1.1; // Aspect ratio for larger screens
+    if (screenWidth > 1500) {
+      return 0.8;
+    } else if (screenWidth > 1000) {
+      return 0.7; // Aspect ratio for larger screens
     } else if (screenWidth > 800) {
       return 0.9; // Aspect ratio for medium screens
     } else {
