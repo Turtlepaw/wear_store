@@ -93060,7 +93060,8 @@ if(s>1200)return 6
 else if(s>800)return 3
 else return 2},
 a8Z(a){var s=A.bB(a,null,t.l).w.a.a
-if(s>1200)return 1.1
+if(s>1500)return 0.8
+else if(s>1000)return 0.7
 else if(s>800)return 0.9
 else return 0.8}}
 A.ath.prototype={
